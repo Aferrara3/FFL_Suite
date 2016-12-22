@@ -42,7 +42,7 @@ public class Espn_Soup {
 
         OutputStreamWriter w = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
 
-        w.write("{\"loginValue\":\"xalexanderfx@gmail.com\",\"password\":\"Tanny322!\"}");
+        w.write("{\"loginValue\":\"EMAIL\",\"password\":\"PASSWORD\"}");
         w.close();
 
         System.out.println("Request URL ... " + url);

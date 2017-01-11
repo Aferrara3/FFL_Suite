@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -108,6 +110,85 @@ public class league {
 		}
 	}
 	
+	double[][] op_PF, op_PA, op_outcome;
+	boolean[][] op_wins;
+	int teamId, week;
+	ArrayList<String> startersPos;
+	protected void populateOptimized(int teamId, int week) throws IOException{
+		String url = "http://games.espn.com/ffl/boxscorescoring?leagueId="+leagueId+"&teamId="+teamId+"&scoringPeriodId="+week+"&seasonId="+seasonId+"&view=scoringperiod&version=scoring";
+		startersPos = new ArrayList<String>();
+		//needs teamId and week as loop vars
+		/*
+		 * Identify 2 team ids
+		 * Record all players on roster position/points
+		 * Iterate through lineup positions available for league
+		 * 	Identify highest available point for that position
+		 *  Add points for that player to total and remove player as option
+		 *  	Do so by setting thei points to 0 => then if all else negative this will win as equivalent of not playing anyone
+		 *  Loop through PF and op_PF to see who had the most times with optimal lineups
+		 *  
+		 *  !*!*!*!*! BEWARE BOUNDS ISSUES WHEN SOMEONE DOESN"T HAVE A FULL BENCH !*!*!*!*!
+		 * */
+		Document doc = Jsoup.connect(url).get();
+		Elements players = doc.select("tr.pncPlayerRow");
+		String[] positions = new String[players.size()];
+		double[] scores = new double[players.size()];
+		int k = 0;
+		boolean firstSet = true;
+		boolean team2 = false;
+		int[] teamSize = {0, 0};
+		for(Element player : players ){
+			String text = player.text();
+			String posPlayed = text.split(" ")[0];
+			String posActual = text.split(",|\\D/ST",2)[1].split(" ")[1].split(" ")[0];
+			
+			//Store posActual and score in arrays here in order
+			positions[k] = posActual;	 
+			scores[k] = Double.parseDouble(text.split(" ")[text.split(" ").length-1]);;
+			System.out.println(text);
+
+			if(firstSet){
+				if(posPlayed.equals("Bench")){ firstSet = false;}
+				else startersPos.add(posPlayed);
+			}
+			if(!firstSet){
+				if (team2 == false && !posPlayed.equals("Bench")){
+					team2 = true;
+				}
+			}
+			if(!team2) teamSize[0] = teamSize[0]+1;
+			else teamSize[1] = teamSize[1]+1;
+		}
+		printArray(teamSize,0,1);
+		double[] startersScores = new double[startersPos.size()];
+		Arrays.fill(startersScores, 0);
+			//Loop through positions and players every time sounds shitty (but easier)
+			//Store starters values on first run and just compare bench?
+				// Would have to compare bench until no more changes made, as multiple rounds may be needed for FLEX - min 2 runs to verify 1
+
+			/* Brute force approach */ 
+			for(int i=0; i<positions.length; i++){
+	            double pScore = scores[i];
+	            String pPos = positions[i];
+	            
+	            for(int j=0; j<startersPos.size(); j++){
+	                String currPos = startersPos.get(j);
+	                double currScore = startersScores[j];
+	                if(pPos.equals(currPos) || (pPos.matches("A|B|D")&&currPos.equals("FLEX"))){
+	                    if(pScore > currScore){
+	                        double temp = currScore;
+	                        currScore = pScore;
+	                        pScore = temp;
+	                        startersScores[j] = currScore;
+	                    }
+	                }
+	            }
+	            printArray(startersScores,0,startersScores.length);
+			}
+			/* End brute force */
+			
+	}
+	
 	/* START SECTION ESPN STORING COOKIES FROM LOGIN */
 	/*String url = "https://ha.registerdisney.go.com/jgc/v5/client/ESPN-ESPNCOM-PROD/guest/login?langPref=en-US";
     URL obj = new URL(url);
@@ -174,6 +255,15 @@ public class league {
 	    }
 	}
 	private static void printArray(double[] anArray, int start, int end) {
+	    for (int i = start; i <= end; i++) {
+	       if (i > start) {
+	          System.out.print(", ");
+	       }
+	       System.out.print(anArray[i]);
+	    }
+	    System.out.print("\n");
+	}
+	private static void printArray(int[] anArray, int start, int end) {
 	    for (int i = start; i <= end; i++) {
 	       if (i > start) {
 	          System.out.print(", ");

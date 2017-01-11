@@ -19,29 +19,30 @@ public class Espn_Soup {
 		
 		league my_league = new league(1283828, 2016);
 		//my_league.populateFull();
-		my_league.populateStatsForRange(1,2);
-		my_league.printStatsForRange(1,2);
-		
+		//my_league.populateStatsForRange(1,4);
+		//my_league.printStatsForRange(1,4);
+		my_league.populateOptimized(1, 1);
     }
 }
 
-/*****************************************************
-					To Do Items
-******************************************************
-	 - Setup github repo for versioning safety - DONE
- 	 - Modularize into relevant functions - DONE
+/*********************************************************
+			    	   To Do Items
+**********************************************************
+	- Setup github repo for versioning safety - DONE
+	- Modularize existing into relevant functions - DONE
  		- Param weeks range - DONE
+	- Break up stat print to be per team
+		- Can then call that in loop
  	- Optimized lineups
- 		- Week + playerid params
 	- Front end
- 	- Pushing to db
+	- Pushing to db
  		- db design
- 	- Scoreboard parsing for weeks 14-17
- 	- Name parsing with team names
+	- Scoreboard parsing for weeks 14-17
+	- Name parsing with team names
  		- Division separation for playoff odds
- 	- Tie in the cookies
- 	- Playoff odds calculations
- 	- CSV Export
-******************************************************/
+	- Tie in the cookies
+	- Playoff odds calculations
+	- CSV Export
+**********************************************************/
 
 
